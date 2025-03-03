@@ -97,7 +97,7 @@
 		(descr "Diode Mini-MELF (SOD-80)")
 		(tags "Diode Mini-MELF (SOD-80)")
 		(property "Reference" "D1"
-			(at 0.1875 0.7 360)
+			(at 0.1875 0.7 0)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "4c305439-03ec-462d-9569-aa221e86a082")
@@ -109,7 +109,7 @@
 			)
 		)
 		(property "Value" "D"
-			(at 0 2 360)
+			(at 0 2 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "1cc23a5e-33ab-44e5-a75e-3c283691ddea")
@@ -1001,7 +1001,7 @@
 		(descr "Diode Mini-MELF (SOD-80)")
 		(tags "Diode Mini-MELF (SOD-80)")
 		(property "Reference" "D2"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "2254011f-d8ae-4e75-818d-6760ce0b1342")
@@ -1013,7 +1013,7 @@
 			)
 		)
 		(property "Value" "D"
-			(at 0 2 360)
+			(at 0 2 0)
 			(layer "F.Fab")
 			(uuid "e07b0c39-6b62-4c54-9737-4d7875bc7312")
 			(effects
@@ -1626,7 +1626,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R3"
-			(at -0.1075 1.4 360)
+			(at -0.1075 1.4 0)
 			(layer "B.SilkS")
 			(hide yes)
 			(uuid "8d3fdcd3-3b38-4b1d-b084-c74d9ca93a31")
@@ -1639,7 +1639,7 @@
 			)
 		)
 		(property "Value" "4700"
-			(at 0 -1.65 360)
+			(at 0 -1.65 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "3850eea0-89e1-4be0-b70e-da761c8de4fa")
@@ -1799,7 +1799,7 @@
 			(uuid "542ccc6f-31dd-4292-bbb2-d1d3ed5c5d45")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "B.Fab")
 			(uuid "7222f5fc-64d1-447f-9040-d2b317f14809")
 			(effects
@@ -2067,7 +2067,7 @@
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C1"
-			(at 2.62 0 360)
+			(at 2.62 0 0)
 			(layer "B.SilkS")
 			(uuid "74b27f36-17e3-47a2-94bc-d03ef847ca8b")
 			(effects
@@ -2079,7 +2079,7 @@
 			)
 		)
 		(property "Value" "100n"
-			(at 0 -1.68 360)
+			(at 0 -1.68 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "af568abe-5288-4a8e-8c07-b28edace19dd")
@@ -2239,7 +2239,7 @@
 			(uuid "539fb460-9292-4ff0-81cd-46ff82d33c23")
 		)
 		(fp_text user "${REFERENCE}"
-			(at -0.9 0.2 360)
+			(at -0.9 0.2 0)
 			(layer "B.Fab")
 			(uuid "d4a8368f-a135-4f4e-8fdd-576cb7be9c02")
 			(effects
@@ -2287,7 +2287,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R2"
-			(at 0.1925 -1.7 360)
+			(at 0.1925 -1.7 0)
 			(layer "B.SilkS")
 			(uuid "7d3edf51-029e-4b14-ab29-22073e57d3d8")
 			(effects
@@ -2298,8 +2298,8 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "15000"
-			(at 0 -1.65 360)
+		(property "Value" "12000"
+			(at 0 -1.65 0)
 			(layer "B.Fab")
 			(hide yes)
 			(uuid "5b2f25cd-8b7a-484b-942c-8c33857e9147")
@@ -2459,7 +2459,7 @@
 			(uuid "31913d60-2ae4-462f-9183-e380b4620d94")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "B.Fab")
 			(uuid "70cb3227-8cec-453e-8f6b-6de454432326")
 			(effects
@@ -2519,7 +2519,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "82000"
+		(property "Value" "68000"
 			(at 0 -1.65 0)
 			(layer "B.Fab")
 			(hide yes)
