@@ -56,7 +56,20 @@
 
 #define OLED_PAGES             4
 #define OLED_COLUMN_OFFSET     32
+/*
+ * Font scaling: each font pixel becomes SCALE_X x SCALE_Y screen pixels.
+ * 2 x 4 is the largest that fits "00.00V" on a 64x32 panel.
+ * For a proportional (non-stretched) look, use SCALE_Y 2.
+ */
+#define FONT_SCALE_X           2
+#define FONT_SCALE_Y           2
+#define FONT_SPACING           1
 
+/* 4 digits + narrow dot + V, as drawn by oled_draw_voltage() */
+#define VOLTAGE_TEXT_WIDTH \
+    (4 * (5 * FONT_SCALE_X + FONT_SPACING) + \
+     (2 * FONT_SCALE_X + FONT_SPACING) + \
+     (5 * FONT_SCALE_X))
 
 /* ============================================================
    I2C
@@ -554,29 +567,47 @@ static void oled_clear(void)
    DRAW CHARACTER
    ============================================================ */
 
-static void oled_draw_char(
+/* Set one pixel in the framebuffer. */
+static void oled_set_pixel(uint8_t x, uint8_t y)
+{
+    if (x >= OLED_WIDTH || y >= OLED_HEIGHT)
+        return;
+
+    /*
+     * SSD1306 page layout: each byte is 8 vertical pixels (bit 0 = top),
+     * and the buffer is organized as pages of OLED_WIDTH bytes.
+     * https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf
+     * (section 8.7 "Graphic Display Data RAM (GDDRAM)")
+     */
+    oledBuffer[(y / 8) * OLED_WIDTH + x] |= (1 << (y % 8));
+}
+
+
+/*
+ * Draws one scaled character and returns how many pixels to advance
+ * the cursor (0 if the character is not in the font).
+ */
+static uint8_t oled_draw_char(
     uint8_t x,
     uint8_t y,
     uint8_t character
 )
 {
     uint8_t fontIndex;
+    uint8_t firstColumn = 0;
+    uint8_t lastColumn  = 4;
 
-
-    /*
-     * Map character to font table.
-     */
-
-    if (
-        character >= '0' &&
-        character <= '9'
-    )
+    if (character >= '0' && character <= '9')
     {
         fontIndex = character - '0';
     }
     else if (character == '.')
     {
         fontIndex = 10;
+
+        /* The dot only uses font columns 1 and 2: skip the empty ones. */
+        firstColumn = 1;
+        lastColumn  = 2;
     }
     else if (character == 'V')
     {
@@ -584,64 +615,34 @@ static void oled_draw_char(
     }
     else
     {
-        return;
+        return 0;
     }
 
-
-    /*
-     * This font is 7 pixels high,
-     * therefore y must be within page 0..3.
-     */
-
-    if (y >= OLED_HEIGHT)
-        return;
-
-
-    /*
-     * Draw five columns.
-     */
-
-    for (
-        uint8_t column = 0;
-        column < 5;
-        column++
-    )
+    for (uint8_t column = firstColumn; column <= lastColumn; column++)
     {
-        uint8_t xx = x + column;
+        uint8_t bits = font5x7[fontIndex][column];
 
-        if (xx >= OLED_WIDTH)
-            continue;
-
-
-        uint8_t bits =
-            font5x7[fontIndex][column];
-
-
-        for (
-            uint8_t row = 0;
-            row < 7;
-            row++
-        )
+        for (uint8_t row = 0; row < 7; row++)
         {
-            uint8_t yy = y + row;
-
-            if (yy >= OLED_HEIGHT)
+            if (!(bits & (1 << row)))
                 continue;
 
-
-            if (bits & (1 << row))
+            /* Expand this font pixel into a SCALE_X x SCALE_Y block. */
+            for (uint8_t dx = 0; dx < FONT_SCALE_X; dx++)
             {
-                uint16_t index =
-                    (yy / 8) * OLED_WIDTH +
-                    xx;
-
-                oledBuffer[index] |=
-                    (1 << (yy % 8));
+                for (uint8_t dy = 0; dy < FONT_SCALE_Y; dy++)
+                {
+                    oled_set_pixel(
+                        x + (column - firstColumn) * FONT_SCALE_X + dx,
+                        y + row * FONT_SCALE_Y + dy
+                    );
+                }
             }
         }
     }
-}
 
+    return (lastColumn - firstColumn + 1) * FONT_SCALE_X + FONT_SPACING;
+}
 
 /* ============================================================
    DRAW VOLTAGE
@@ -695,78 +696,19 @@ static void oled_draw_voltage(
 
     text[6] = '\0';
 
-
-    /*
-     * Six characters.
-     *
-     * Character width = 6 pixels
-     *
-     * Total = 36 pixels.
-     *
-     * Center on a 64-pixel display.
+        /*
+     * Center horizontally using the computed text width,
+     * and vertically using the scaled font height (7 rows).
      */
+    uint8_t x = (OLED_WIDTH - VOLTAGE_TEXT_WIDTH) / 2;
+    uint8_t y = (OLED_HEIGHT - 7 * FONT_SCALE_Y) / 2;
 
-    uint8_t x =
-        (OLED_WIDTH - 36) / 2;
-
-    uint8_t y = 12;
-
-
-    for (
-        uint8_t i = 0;
-        i < 6;
-        i++
-    )
+    for (uint8_t i = 0; i < 6; i++)
     {
-        oled_draw_char(
-            x,
-            y,
-            text[i]
-        );
-
-        x += 6;
+        x += oled_draw_char(x, y, text[i]);
     }
 }
-/* ============================================================
-   DRAW RAW NUMBER (DEBUG)
-   ============================================================ */
 
-static void oled_draw_raw(
-    uint16_t value
-)
-{
-    /*
-     * 12-bit ADC result: 0..4095, always fits in 4 digits.
-     * CH32V003 Reference Manual, ADC chapter (12-bit data register):
-     * https://www.wch-ic.com/downloads/CH32V003RM_PDF.html
-     */
-    if (value > 9999)
-        value = 9999;
-
-    /*
-     * 4 characters x 6 pixels = 24 pixels, centered on 64 pixels.
-     */
-    uint8_t x = (OLED_WIDTH - 24) / 2;
-    uint8_t y = 12;
-
-    /*
-     * Extract digits from most to least significant,
-     * reusing oled_draw_char() from the existing code.
-     */
-    uint16_t divisor = 1000;
-
-    for (uint8_t i = 0; i < 4; i++)
-    {
-        oled_draw_char(
-            x,
-            y,
-            '0' + ((value / divisor) % 10)
-        );
-
-        divisor /= 10;
-        x += 6;
-    }
-}
 
 /* ============================================================
    OLED UPDATE
